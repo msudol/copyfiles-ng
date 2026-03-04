@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 var copyfiles = require('./index');
-var args = require('yargs');
+var yargs = require('yargs/yargs');
+var { hideBin } = require('yargs/helpers');
 var path = require('path');
+var args = yargs(hideBin(process.argv));
 args.alias('u', 'up')
   .describe('u', 'slice a path off the bottom of the paths')
   .number('u')

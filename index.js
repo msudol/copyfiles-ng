@@ -2,7 +2,7 @@
 var path = require('path');
 var fs = require('fs');
 var { globSync } = require('glob');
-var mkdirp = require('mkdirp');
+var { mkdirp } = require('mkdirp');
 var untildify = require('untildify');
 var through = require('through2').obj;
 var noms = require('noms').obj;
@@ -48,7 +48,15 @@ function _copyFile (src, dst, opts, callback) {
 }
 if (fs.copyFile) {
   copyFile = function (src, dst, opts, callback) {
-    fs.copyFile(src, dst, callback);
+    fs.copyFile(src, dst, function (err) {
+      if (err) {
+        return callback(err);
+      }
+      if (typeof opts.mode === 'number') {
+        return fs.chmod(dst, opts.mode, callback);
+      }
+      callback();
+    });
   }
 }
 function makeDebug(config) {

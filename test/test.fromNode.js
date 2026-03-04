@@ -1,30 +1,40 @@
 'use strict';
 var test = require('tape');
 var copyfiles = require('../');
-var rimraf = require('rimraf');
+var { rimraf } = require('rimraf');
 var fs = require('fs');
-var _mkdirp = require('mkdirp');
+var { mkdirp: mkdirpAsync } = require('mkdirp');
 var cp = require('child_process');
 var { globSync } = require('glob');
+var path = require('path');
+var nodeExec = process.execPath;
+function runCli(args) {
+  var script = path.resolve(__dirname, '..', 'copyfiles');
+  return cp.spawnSync(nodeExec, [script].concat(args));
+}
+function runCopyup(args) {
+  var script = path.resolve(__dirname, '..', 'copyup');
+  return cp.spawnSync(nodeExec, [script].concat(args));
+}
 const mkdirp = (path, cb) => {
-  _mkdirp(path).then(()=>{
+  mkdirpAsync(path).then(()=>{
     cb();
   }, cb);
 }
-function after(t) {
-  rimraf('output', function (err) {
-    t.error(err, 'rm out');
-    rimraf('input', function (err) {
-      t.error(err, 'rm input');
-      t.end();
+function after() {
+  return rimraf('output')
+    .then(function () {
+      return rimraf('input');
     });
-  });
 }
-function before(t) {
-  mkdirp('input/other', function (err) {
-    t.error(err, 'rm input');
-    t.end();
-  });
+function before() {
+  return rimraf('output')
+    .then(function () {
+      return rimraf('input');
+    })
+    .then(function () {
+      return mkdirpAsync('input/other');
+    });
 }
 
 test('normal', function (t) {
@@ -57,7 +67,11 @@ test('modes', function (t) {
       fs.readdir('output/input', function (err, files) {
         t.error(err, 'readdir');
         t.deepEquals(files, ['a.txt', 'b.txt'], 'correct number of things');
-        t.equals(fs.statSync('output/input/a.txt').mode, 33261, 'correct mode')
+        if (process.platform !== 'win32') {
+          t.equals(fs.statSync('output/input/a.txt').mode, 33261, 'correct mode');
+        } else {
+          t.ok(true, 'skip mode on win32');
+        }
         t.end();
       });
     });
@@ -91,7 +105,7 @@ test('exclude cl', function (t) {
     fs.writeFileSync('input/b.txt', 'b');
     fs.writeFileSync('input/c.js.txt', 'c');
     fs.writeFileSync('input/d.ps.txt', 'd');
-    cp.spawnSync('./copyfiles', ['-e', '**/*.js.txt', '-e', '**/*.ps.txt', 'input/*.txt', 'output']);
+  runCli(['-e', '**/*.js.txt', '-e', '**/*.ps.txt', 'input/*.txt', 'output']);
     fs.readdir('output/input', function (err, files) {
       t.error(err, 'readdir');
       t.deepEquals(files, ['a.txt', 'b.txt'], 'correct number of things');
@@ -125,7 +139,7 @@ test('all from cl', function (t) {
     fs.writeFileSync('input/a.txt', 'a');
     fs.writeFileSync('input/b.txt', 'b');
     fs.writeFileSync('input/.c.txt', 'c');
-    cp.spawnSync('./copyfiles', ['-a', 'input/*.txt', 'output']);
+  runCli(['-a', 'input/*.txt', 'output']);
     fs.readdir('output/input', function (err, files) {
       t.error(err, 'readdir');
       t.deepEquals(files, ['.c.txt', 'a.txt', 'b.txt'], 'correct number of things');
@@ -138,7 +152,7 @@ test('error on nothing copied', function (t) {
   t.test('setup', before);
   t.test('copy stuff', function (t) {
     fs.writeFileSync('input/.c.txt', 'c');
-    var out = cp.spawnSync('./copyfiles', ['-E', 'input/*.txt', 'output']);
+  var out = runCli(['-E', 'input/*.txt', 'output']);
     t.ok(out.status, 'should error');
     t.end();
   });
@@ -150,7 +164,7 @@ test('all from cl 2', function (t) {
     fs.writeFileSync('input/a.txt', 'a');
     fs.writeFileSync('input/b.txt', 'b');
     fs.writeFileSync('input/.c.txt', 'c');
-    cp.spawnSync('./copyfiles', ['--all', 'input/*.txt', 'output']);
+  runCli(['--all', 'input/*.txt', 'output']);
     fs.readdir('output/input', function (err, files) {
       t.error(err, 'readdir');
       t.deepEquals(files, ['.c.txt', 'a.txt', 'b.txt'], 'correct number of things');
@@ -196,7 +210,7 @@ test('soft from cl', function (t) {
       fs.writeFileSync('input/other/c.txt', 'inputC');
       fs.writeFileSync('output/input/other/c.txt', 'outputC');
       fs.writeFileSync('input/other/d.txt', 'd');
-      cp.spawnSync('./copyfiles', ['-s', 'input/**/*.txt', 'output']);
+  runCli(['-s', 'input/**/*.txt', 'output']);
 
       fs.readdir('output/input', function (err, files) {
         t.error(err, 'readdir');
@@ -221,7 +235,7 @@ test('soft from cl 2', function (t) {
       fs.writeFileSync('input/other/c.txt', 'inputC');
       fs.writeFileSync('output/input/other/c.txt', 'outputC');
       fs.writeFileSync('input/other/d.txt', 'd');
-      cp.spawnSync('./copyfiles', ['--soft', 'input/**/*.txt', 'output']);
+  runCli(['--soft', 'input/**/*.txt', 'output']);
 
       fs.readdir('output/input', function (err, files) {
         t.error(err, 'readdir');
@@ -258,7 +272,7 @@ test('with up cl', function (t) {
     fs.writeFileSync('input/a.txt', 'a');
     fs.writeFileSync('input/b.txt', 'b');
     fs.writeFileSync('input/c.js', 'c');
-    cp.spawnSync('./copyfiles', ['-u', '1', 'input/*.txt', 'output']);
+  runCli(['-u', '1', 'input/*.txt', 'output']);
     fs.readdir('output', function (err, files) {
       t.error(err, 'readdir');
       t.deepEquals(files, ['a.txt', 'b.txt'], 'correct number of things');
@@ -273,7 +287,7 @@ test('with copyup', function (t) {
     fs.writeFileSync('input/a.txt', 'a');
     fs.writeFileSync('input/b.txt', 'b');
     fs.writeFileSync('input/c.js', 'c');
-    cp.spawnSync('./copyup', ['input/*.txt', 'output']);
+  runCopyup(['input/*.txt', 'output']);
     fs.readdir('output', function (err, files) {
       t.error(err, 'readdir');
       t.deepEquals(files, ['a.txt', 'b.txt'], 'correct number of things');
@@ -322,10 +336,13 @@ test('follow', function (t) {
     fs.mkdirSync('input/origin');
     fs.mkdirSync('input/origin/inner');
     fs.writeFileSync('input/origin/inner/a.txt', 'a');
-    fs.symlinkSync('origin', 'input/dest');
+  var linkType = process.platform === 'win32' ? 'junction' : undefined;
+  fs.symlinkSync('origin', 'input/dest', linkType);
     copyfiles(['input/**/*.txt', 'output'], { up: 1, follow: true }, function (err) {
       t.error(err, 'copyfiles');
-      const files = globSync('output/**/*.txt');
+      const files = globSync('output/**/*.txt').map(function (filePath) {
+        return filePath.replace(/\\/g, '/');
+      });
       t.deepEquals(files, ['output/origin/inner/a.txt', 'output/dest/inner/a.txt'], 'correct number of things');
       t.end();
     });
