@@ -8,7 +8,7 @@ var args = yargs(hideBin(process.argv));
 args.alias('u', 'up')
   .describe('u', 'slice a path off the bottom of the paths')
   .number('u')
-if (path.basename(args.argv.$0) === 'copyup') {
+if (path.basename(process.argv[1], path.extname(process.argv[1])) === 'copyup') {
   args.default('u', '1');
 }
 args.alias('a', 'all')

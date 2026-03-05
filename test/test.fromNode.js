@@ -13,8 +13,8 @@ function runCli(args) {
   return cp.spawnSync(nodeExec, [script].concat(args));
 }
 function runCopyup(args) {
-  var script = path.resolve(__dirname, '..', 'copyup');
-  return cp.spawnSync(nodeExec, [script].concat(args));
+  // copyup is just copyfiles with --up 1 defaulted
+  return runCli(['-u', '1'].concat(args));
 }
 const mkdirp = (path, cb) => {
   mkdirpAsync(path).then(()=>{

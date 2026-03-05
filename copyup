@@ -1,4 +1,8 @@
 #!/usr/bin/env node
 'use strict';
-process.argv[1] = __filename;
+// copyup is copyfiles with --up 1 defaulted.
+// When installed via npm, package.json bin maps "copyup-fixed" directly
+// to "./copyfiles", which detects the name and defaults --up 1.
+// This script exists only for direct invocation (e.g. ./copyup).
+process.argv.splice(2, 0, '-u', '1');
 require('./copyfiles');
