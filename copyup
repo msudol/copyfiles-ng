@@ -1,14 +1,3 @@
 #!/usr/bin/env node
 'use strict';
-var cp = require('child_process');
-var path = require('path');
-var args = process.argv.slice(2);
-var hasUp = args.includes('-u') || args.includes('--up');
-if (!hasUp) {
-	args = ['-u', '1'].concat(args);
-}
-var script = path.resolve(__dirname, 'copyfiles');
-var result = cp.spawnSync(process.execPath, [script].concat(args), {
-	stdio: 'inherit'
-});
-process.exit(result.status === null ? 1 : result.status);
+require('./copyfiles');
