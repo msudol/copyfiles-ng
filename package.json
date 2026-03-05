@@ -1,11 +1,11 @@
 {
-  "name": "copyfilez",
-  "version": "2.4.5",
-  "description": "Fork of copyfiles-fixed, which is a fork of copyfiles with glob security fix",
+  "name": "copyfiles-ng",
+  "version": "2.4.6",
+  "description": "Actively maintained fork of copyfiles with security fixes and modern dependency support",
   "main": "index.js",
   "bin": {
-    "copyfiles-fixed": "./copyfiles",
-    "copyup-fixed": "./copyfiles"
+    "copyfiles-ng": "./copyfiles",
+    "copyup-ng": "./copyfiles"
   },
   "scripts": {
     "test": "tape test/test.*.js | tspec"
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/msudol/copyfilez.git"
+    "url": "https://github.com/msudol/copyfiles-ng.git"
   },
   "devDependencies": {
     "rimraf": "^6.1.3",

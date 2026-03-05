@@ -8,13 +8,13 @@ This package is a fork of `copyfiles` with security and maintenance updates:
 ## Install
 
 ```bash
-npm install copyfiles-fixed
+npm install copyfiles-ng
 ```
 
 ## Command line
 
 ```bash
-  Usage: copyfiles-fixed [options] inFile [more files ...] outDirectory
+  Usage: copyfiles-ng [options] inFile [more files ...] outDirectory
 
   Options:
     -u, --up       slice a path off the bottom of the paths               [number]
@@ -32,7 +32,7 @@ npm install copyfiles-fixed
 Copy one or more files (including globs); the last argument is the output directory, which will be created if needed. On Windows, globs must be **double quoted**. Other shells may use single or double quotes.
 
 ```bash
-copyfiles-fixed foo foobar foo/bar/*.js out
+copyfiles-ng foo foobar foo/bar/*.js out
 ```
 
 This produces an `out` directory containing `foo`, `foobar`, and a nested `foo/bar` folder with all matches from `foo/bar/*.js`.
@@ -40,19 +40,19 @@ This produces an `out` directory containing `foo`, `foobar`, and a nested `foo/b
 If you want to omit a leading folder from the output path, use `--up`:
 
 ```bash
-copyfiles-fixed something/*.js out
+copyfiles-ng something/*.js out
 ```
 
 This would place the JS files under `out/something`. To drop that folder, use:
 
 ```bash
-copyfiles-fixed -u 1 something/*.js out
+copyfiles-ng -u 1 something/*.js out
 ```
 
 To flatten all outputs into one directory:
 
 ```bash
-copyfiles-fixed -f ./foo/*.txt ./foo/bar/*.txt out
+copyfiles-ng -f ./foo/*.txt ./foo/bar/*.txt out
 ```
 
 This puts `a.txt` and `b.txt` directly into `out`.
@@ -60,25 +60,25 @@ This puts `a.txt` and `b.txt` directly into `out`.
 If your terminal doesn’t support globstars, quote the pattern:
 
 ```bash
-copyfiles-fixed -f ./foo/**/*.txt out
+copyfiles-ng -f ./foo/**/*.txt out
 ```
 
 This does not work by default on macOS, but quoting does:
 
 ```bash
-copyfiles-fixed -f "./foo/**/*.txt" out
+copyfiles-ng -f "./foo/**/*.txt" out
 ```
 
 You can also quote globstars within mixed inputs:
 
 ```bash
-copyfiles-fixed some.json "./some_folder/*.json" ./dist/ && echo 'JSON files copied.'
+copyfiles-ng some.json "./some_folder/*.json" ./dist/ && echo 'JSON files copied.'
 ```
 
 To exclude files, pass one or more `-e` patterns:
 
 ```bash
-copyfiles-fixed -e "**/*.test.js" -f ./foo/**/*.js out
+copyfiles-ng -e "**/*.test.js" -f ./foo/**/*.js out
 ```
 
 Other options include:
@@ -93,7 +93,7 @@ The package also provides a `copyup` command, identical to `copyfiles`, but with
 ## Programmatic API
 
 ```js
-var copyfiles = require('copyfiles-fixed');
+var copyfiles = require('copyfiles-ng');
 
 copyfiles([paths], opt, callback);
 ```
