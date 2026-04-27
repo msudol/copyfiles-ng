@@ -1,6 +1,6 @@
 {
   "name": "copyfiles-ng",
-  "version": "2.4.6",
+  "version": "2.4.7",
   "description": "Actively maintained fork of copyfiles with security fixes and modern dependency support",
   "main": "index.js",
   "bin": {
