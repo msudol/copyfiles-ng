@@ -3,6 +3,9 @@
   "version": "2.4.9",
   "description": "Actively maintained fork of copyfiles with security fixes and modern dependency support",
   "main": "index.js",
+  "files": [
+    "index.js"
+  ],
   "bin": {
     "copyfiles-ng": "copyfiles",
     "copyup-ng": "copyfiles"
